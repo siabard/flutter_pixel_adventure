@@ -7,8 +7,8 @@ import 'package:flame/input.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:flutter/material.dart';
-import 'package:pixel_adventure/actors/player.dart';
-import 'package:pixel_adventure/levels/level.dart';
+import 'package:pixel_adventure/components/player.dart';
+import 'package:pixel_adventure/components/level.dart';
 
 class PixelAdventure extends FlameGame
     with
@@ -40,12 +40,10 @@ class PixelAdventure extends FlameGame
       height: 360,
     );
     cam.viewfinder.anchor = Anchor.topLeft;
-
-    addAll([cam, world]);
-
     if (showJoystick) {
-      addJoyStick();
+      addJoyStick(cam);
     }
+    addAll([cam, world]);
 
     return super.onLoad();
   }
@@ -59,7 +57,7 @@ class PixelAdventure extends FlameGame
     super.update(dt);
   }
 
-  void addJoyStick() {
+  void addJoyStick(CameraComponent cam) {
     joystick = JoystickComponent(
       priority: 100,
       knob: SpriteComponent(
@@ -72,10 +70,10 @@ class PixelAdventure extends FlameGame
           images.fromCache('HUD/Joystick.png'),
         ),
       ),
-      margin: const EdgeInsets.only(left: 32, bottom: 32),
+      margin: const EdgeInsets.only(left: 40, bottom: 40),
     );
 
-    add(joystick);
+    cam.viewport.add(joystick);
   }
 
   void updateJoystick() {
@@ -83,15 +81,15 @@ class PixelAdventure extends FlameGame
       case JoystickDirection.left:
       case JoystickDirection.upLeft:
       case JoystickDirection.downLeft:
-        player.playerDirection = PlayerDirection.left;
+        player.horizontalMovement = -1;
         break;
       case JoystickDirection.right:
       case JoystickDirection.upRight:
       case JoystickDirection.downRight:
-        player.playerDirection = PlayerDirection.right;
+        player.horizontalMovement = 1;
         break;
       default:
-        player.playerDirection = PlayerDirection.none;
+        player.horizontalMovement = 0;
         break;
     }
   }
