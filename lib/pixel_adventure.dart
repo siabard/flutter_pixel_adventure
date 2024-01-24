@@ -7,6 +7,7 @@ import 'package:flame/input.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:flutter/material.dart';
+import 'package:pixel_adventure/components/jump_button.dart';
 import 'package:pixel_adventure/components/player.dart';
 import 'package:pixel_adventure/components/level.dart';
 
@@ -21,31 +22,39 @@ class PixelAdventure extends FlameGame
   late CameraComponent cam;
   Player player = Player(character: 'Mask Dude');
 
-  late JoystickComponent joystick;
-  bool showJoystick = false;
+  JoystickComponent? joystick;
+  bool showJoystick = true;
+  List<String> levelName = ['Level-01', 'Level-01'];
+  int currentLevelIndex = 0;
 
   @override
   FutureOr<void> onLoad() async {
     // Load all images into cache
     await images.loadAllImages();
 
-    Level world = Level(
-      levelName: 'Level-01',
-      player: player,
-    );
-
-    cam = CameraComponent.withFixedResolution(
-      world: world,
-      width: 640,
-      height: 360,
-    );
-    cam.viewfinder.anchor = Anchor.topLeft;
-    if (showJoystick) {
-      addJoyStick(cam);
-    }
-    addAll([cam, world]);
+    _loadLevel();
 
     return super.onLoad();
+  }
+
+  void _loadLevel() {
+    Future.delayed(const Duration(seconds: 1), () {
+      Level world = Level(
+        levelName: levelName[currentLevelIndex],
+        player: player,
+      );
+
+      cam = CameraComponent.withFixedResolution(
+        world: world,
+        width: 640,
+        height: 360,
+      );
+      cam.viewfinder.anchor = Anchor.topLeft;
+      if (showJoystick) {
+        addJoyStick(cam);
+      }
+      addAll([cam, world]);
+    });
   }
 
   @override
@@ -59,7 +68,7 @@ class PixelAdventure extends FlameGame
 
   void addJoyStick(CameraComponent cam) {
     joystick = JoystickComponent(
-      priority: 100,
+      priority: 10,
       knob: SpriteComponent(
         sprite: Sprite(
           images.fromCache('HUD/Knob.png'),
@@ -73,24 +82,36 @@ class PixelAdventure extends FlameGame
       margin: const EdgeInsets.only(left: 40, bottom: 40),
     );
 
-    cam.viewport.add(joystick);
+    cam.viewport.add(joystick!);
+    cam.viewport.add(JumpButton());
   }
 
   void updateJoystick() {
-    switch (joystick.direction) {
-      case JoystickDirection.left:
-      case JoystickDirection.upLeft:
-      case JoystickDirection.downLeft:
-        player.horizontalMovement = -1;
-        break;
-      case JoystickDirection.right:
-      case JoystickDirection.upRight:
-      case JoystickDirection.downRight:
-        player.horizontalMovement = 1;
-        break;
-      default:
-        player.horizontalMovement = 0;
-        break;
+    if (joystick != null) {
+      switch (joystick!.direction) {
+        case JoystickDirection.left:
+        case JoystickDirection.upLeft:
+        case JoystickDirection.downLeft:
+          player.horizontalMovement = -1;
+          break;
+        case JoystickDirection.right:
+        case JoystickDirection.upRight:
+        case JoystickDirection.downRight:
+          player.horizontalMovement = 1;
+          break;
+        default:
+          player.horizontalMovement = 0;
+          break;
+      }
+    }
+  }
+
+  void loadNextLevel() {
+    if (currentLevelIndex < levelName.length - 1) {
+      currentLevelIndex++;
+      _loadLevel();
+    } else {
+      // no more levels
     }
   }
 }
