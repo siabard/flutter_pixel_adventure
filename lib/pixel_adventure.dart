@@ -22,7 +22,7 @@ class PixelAdventure extends FlameGame
   Player player = Player(character: 'Mask Dude');
 
   late JoystickComponent joystick;
-  bool showJoystick = true;
+  bool showJoystick = false;
 
   @override
   FutureOr<void> onLoad() async {
