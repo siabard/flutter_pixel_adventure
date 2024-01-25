@@ -49,8 +49,9 @@ class CheckPoint extends SpriteAnimationComponent
         loop: false,
       ),
     );
-
     await animationTicker?.completed;
+    animationTicker?.reset();
+
     animation = SpriteAnimation.fromFrameData(
       game.images.fromCache(
           'Items/Checkpoints/Checkpoint/Checkpoint (Flag Idle)(64x64).png'),

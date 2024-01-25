@@ -23,9 +23,12 @@ class PixelAdventure extends FlameGame
   Player player = Player(character: 'Mask Dude');
 
   JoystickComponent? joystick;
-  bool showJoystick = true;
+  bool showJoystick = false;
   List<String> levelName = ['Level-01', 'Level-01'];
   int currentLevelIndex = 0;
+
+  bool playSound = true;
+  double soundVolume = 1.0;
 
   @override
   FutureOr<void> onLoad() async {
@@ -107,11 +110,15 @@ class PixelAdventure extends FlameGame
   }
 
   void loadNextLevel() {
+    removeWhere((component) => component is Level);
+
     if (currentLevelIndex < levelName.length - 1) {
       currentLevelIndex++;
       _loadLevel();
     } else {
       // no more levels
+      currentLevelIndex = 0;
+      _loadLevel();
     }
   }
 }
